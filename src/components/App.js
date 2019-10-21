@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="container-fluid">
       <Header />
-      <Route path="/" component={HomePage} />
+      <Route path="/" exact component={HomePage} />
       <Route path="/courses" component={CoursesPage} />
       <Route path="/about" component={AboutPage} />
     </div>
