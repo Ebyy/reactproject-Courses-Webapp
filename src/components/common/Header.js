@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 function Header() {
-  const activeIndicator = { color: "black" };
+  const activeIndicator = { color: "limegreen" };
   return (
     <nav>
       <NavLink activeStyle={activeIndicator} exact to="/">
