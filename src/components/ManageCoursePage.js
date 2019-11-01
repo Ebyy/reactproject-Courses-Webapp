@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 //import { Prompt } from "react-router-dom";
 import CourseForm from "./CourseForm";
-import { saveCourse } from "../api/courseApi";
-import { getCourseBySlug } from "../api/courseApi";
+import courseStore from "../stores/courseStore";
+import * as courseActions from "../actions/courseActions";
 import { toast } from "react-toastify";
+
 const ManageCoursePage = props => {
   const [errors, setErrors] = useState({});
+  const [courses, setCourses] = useState(courseStore.getCourses());
   const [course, setCourse] = useState({
     id: null,
     slug: "",
@@ -15,14 +17,19 @@ const ManageCoursePage = props => {
   });
 
   useEffect(() => {
+    courseStore.addChangeListener(onChange);
     const slug = props.match.params.slug; //gets slug from path `/course/:slug`
-    if (slug) {
-      getCourseBySlug(slug).then(returnedCourse => {
-        setCourse(returnedCourse);
-      });
+    if (courses.length === 0) {
+      courseActions.loadCourses();
+    } else if (slug) {
+      setCourse(courseStore.getCourseBySlug(slug));
     }
-  }, [props.match.params.slug]);
+    return () => courseStore.removeChangeListener(onChange);
+  }, [courses.length, props.match.params.slug]);
 
+  function onChange() {
+    setCourses(courseStore.getCourses());
+  }
   //copy course object and set the value passed in to the value of name attribute
   function handleChange({ target }) {
     /** destructuring this to be simpler
@@ -48,12 +55,13 @@ const ManageCoursePage = props => {
   function handleSubmit(event) {
     event.preventDefault();
     if (!formIsValid()) return;
-    saveCourse(course).then(() => {
+    courseActions.saveCourse(course).then(() => {
       //redirect user to courses to see saved course
       props.history.push("/courses");
       toast.success("Course was successfully added to Courses.");
     });
   }
+
   return (
     <>
       <h2>Manage Course</h2>
